@@ -1,25 +1,15 @@
+import { fetchEmployeesApi } from '@/src/api/employee';
+import { employeeCardColors } from '@/src/constants/colors';
+import { styles } from '@/src/styles/index.styles';
+import type { Employee } from '@/src/types/employee';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Button,
   FlatList,
-  StyleSheet,
   Text,
   View,
 } from 'react-native';
-
-export type Employee = {
-	id: number;
-	employee_name: string;
-	employee_age: number;
-	employee_salary: number;
-};
-
-export type ApiResponse = {
-	status: string;
-	data: Employee[];
-	message: string;
-};
 
 export default function HomeScreen() {
 	const [employees, setEmployees] = useState<Employee[]>([]);
@@ -30,18 +20,18 @@ export default function HomeScreen() {
 
 	const getCardBackgroundColor = (age: number) => {
 		if (age >= 50) {
-			return '#C8E6C9';
+			return employeeCardColors.age50Plus;
 		}
 		if (age >= 40) {
-			return '#FFF9C4';
+			return employeeCardColors.age40Plus;
 		}
 		if (age >= 30) {
-			return '#BBDEFB';
+			return employeeCardColors.age30Plus;
 		}
 		if (age >= 20) {
-			return '#FFCDD2';
+			return employeeCardColors.age20Plus;
 		}
-		return '#F5F5F5';
+		return employeeCardColors.default;
 	};
 
 	const fetchEmployees = async () => {
@@ -49,9 +39,8 @@ export default function HomeScreen() {
 			setLoading(true);
 			setError(false);
 
-			const response = await fetch('https://dummy.restapiexample.com/api/v1/employees');
-			const json: ApiResponse = await response.json();
-			setEmployees(json.data);
+			const data = await fetchEmployeesApi();
+			setEmployees(data);
 		} catch (fetchError) {
 			console.error(fetchError);
 			setError(true);
@@ -112,34 +101,3 @@ export default function HomeScreen() {
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		padding: 16,
-	},
-	center: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		gap: 12,
-	},
-	headerRow: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		marginBottom: 12,
-	},
-	title: {
-		fontSize: 18,
-		fontWeight: '600',
-	},
-	card: {
-		borderRadius: 10,
-		padding: 12,
-		marginBottom: 10,
-	},
-	name: {
-		fontWeight: '700',
-	},
-});
